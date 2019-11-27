@@ -1,0 +1,83 @@
+library("RODBC")
+library(dplyr)
+require(tidyverse)
+library(sqldf)
+myconn<-odbcConnect("****","****","***")
+IC_Demo<-sqlQuery(myconn,"select * into bricard.Phone from dbo.Phonecall")
+IC_Demo<-sqlQuery(myconn,"select * into bricard.PhoneEnc from dbo.PhoneCall_Encounter")
+df=sqlQuery(myconn,"select * from bricard.Phone")
+sqlQuery(myconn,"Alter Table bricard.Phone Add EnrollmentGroup nvarchar(255)")
+
+sqlQuery(myconn,"select EnrollmentGroup from bricard.Phone where EnrollmentGroup")
+sqlQuery(myconn,"select * from dbo.PhoneCall_Encounter")
+
+sqlQuery(myconn,"select * into bricard.NewPhone
+              from bricard.Phone
+                left join bricard.PhoneEnc
+                on bricard.Phone.tri_CustomerIDEntityReference = bricard.PhoneEnc.CustomerID")
+
+sqlQuery(myconn,
+"update bricard.NewPhone 
+Set EnrollmentGroup = 'Clinical Alert'
+where EncounterCode = 125060000")
+
+
+sqlQuery(myconn,
+         "update bricard.NewPhone 
+Set EnrollmentGroup = 'Clinical Alert'
+where EncounterCode = 125060000")
+
+sqlQuery(myconn,
+         "update bricard.NewPhone 
+Set EnrollmentGroup = 'Health Coaching'
+where EncounterCode = 125060001")
+
+sqlQuery(myconn,
+         "update bricard.NewPhone 
+Set EnrollmentGroup = 'Technical Question'
+where EncounterCode = 125060002")
+
+sqlQuery(myconn,
+         "update bricard.NewPhone 
+Set EnrollmentGroup = 'Administrative'
+where EncounterCode = 125060003")
+
+sqlQuery(myconn,
+         "update bricard.NewPhone 
+Set EnrollmentGroup = 'Other'
+where EncounterCode = 125060004")
+
+sqlQuery(myconn,
+         "update bricard.NewPhone 
+Set EnrollmentGroup = 'Lack of Engagement'
+where EncounterCode = 125060005")
+
+table = sqlQuery(myconn,"select * from bricard.NewPhone")
+
+
+summary(table$EnrollmentGroup)
+
+
+table1 = sqlQuery(myconn,"select * from dbo.TextMessages")
+table2 = sqlQuery(myconn,"select * from dbo.Demographics")
+table3 = sqlQuery(myconn,"select * from dbo.Conditions")
+
+table2 = sqlQuery(myconn,"select * from dbo.Demographics
+                  left join dbo.Conditions
+                  on dbo.Conditions.tri_patientid = dbo.Demographics.contactid
+                  left join dbo.TextMessages
+                  on dbo.TextMessages.tri_contactid=dbo.Demographics.contactid")
+table2
+min=tapply(table2$TextSentDate, table2$SenderName, min)
+max=tapply(table2$TextSentDate, table2$SenderName, max)
+(max-min)/7
+
+table2 = sqlQuery(myconn,"select * from dbo.Demographics
+                  left join dbo.Conditions
+                  on dbo.Conditions.tri_patientid = dbo.Demographics.contactid
+                  left join dbo.TextMessages
+                  on dbo.TextMessages.tri_contactid=dbo.Demographics.contactid
+                  left join dbo.Conditions
+                  on dbo.Conditions.tri_patientid = dbo.Demographics.contactid")
+table2 = sqlQuery(myconn,"select * from dbo.Conditions")
+
